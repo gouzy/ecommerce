@@ -1,6 +1,8 @@
 package fr.alma.ejb.ecommerce.frontal;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import fr.alma.dto.catalogue.Categorie;
@@ -87,21 +89,24 @@ public class Console {
 		}
 	}
 	
-	private void printListAProducts(List<AProduit> list){
+	private Map<Integer, Integer> printListAProducts(List<AProduit> list){
 		System.out.println("Liste des produits trouves : ");
-		int i=3;
+		int i=3, k=3;
+		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
 		for(AProduit p : list){
-			System.out.println(i+" : [marque]"+p.getMarque());
+			int j=-1;
+			System.out.println("[marque]"+p.getMarque());
 			System.out.print("[model]"+p.getModele());
 			List<CProduit> cp = p.getProduitFournis();
 			for(CProduit c : cp){
-				++i;
-				System.out.print("[fournisseur]"+c.getFournisseur());
+				map.put(++i, ++j);
+				System.out.print(++k+" : [fournisseur]"+c.getFournisseur());
 				System.out.print("[prix]"+c.getPrix());
 				System.out.print("[quantite]"+c.getQuantite());
 			}
 			System.out.println();
 		}
+		return map;
 	}
 	
 	private void printBasket(){
@@ -131,9 +136,10 @@ public class Console {
 		result = 1;
 		String brand="";
 		Double low=0.,high=0.;
+		Map<Integer, Integer> map = null;
 		do{
 			//affichage de tous les produits existants
-			printListAProducts(products);
+			map = printListAProducts(products);
 			System.out.println("Filtrer les produits par : ");
 			System.out.println("[1]prix");
 			System.out.println("[2]marque");
@@ -176,13 +182,31 @@ public class Console {
 				System.out.println("Produits de la categorie '"+category.getName()+"' et de marque '"+brand+"'");				System.out.println("Produits de la categorie '"+category.getName()+"' entre "+low+" et "+high+" : ");
 				break;
 			default:
-				AProduit ap = products.get(result-5);
-				System.out.print("Combien en voulez vous? ("+ap.getProduitFournis()+")");
+				AProduit ap = products.get(map.get(result));
+				CProduit cp = ap.getProduitFournis().get(result);
+				System.out.print("Combien en voulez vous? ("+cp.getQuantite()+" maximum)");
 				int quantity = scanner.nextInt();
 				Item item = new Item();
-				basket.addProduct(item, quantity);
+				item.setFournisseur(cp.getFournisseur());
+				item.setMarque(ap.getMarque());
+				item.setModel(ap.getModele());
+				System.out.println("Produit pret a etre enregistre : ");
+				System.out.println("Categorie : "+category.getName());
+				System.out.println("Marque : "+ap.getMarque());
+				System.out.println("Modele : "+ap.getModele());
+				System.out.println("Prix : "+cp.getPrix());
+				System.out.println("(Fournisseur : "+item.getFournisseur()+")");
+				System.out.print("Etes-vous sur? [o/n] : ");
+				String response = scanner.nextLine();
+				if(response.equals("o")){
+					basket.addProduct(item, quantity);
+					result = -1;
+				}
+				else{
+					System.out.println("Commande annulee");
+				}
 			}
-		}while(result!=0);
+		}while(result!=-1);
 	}
 	
 	private void validateBasket(){
