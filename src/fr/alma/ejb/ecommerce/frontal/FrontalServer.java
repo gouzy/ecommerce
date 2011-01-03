@@ -36,8 +36,8 @@ public class FrontalServer implements FrontalRemote {
 	 * @throws NamingException
 	 */
 	public FrontalServer() throws NamingException{
-		Context context = new InitialContext();
-		central = (CentralRemote) context.lookup("CentralService/remote");
+//		Context context = new InitialContext();
+//		central = (CentralRemote) context.lookup("CentralService/remote");
 	}
 	
 	@Override
