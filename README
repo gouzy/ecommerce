@@ -1,0 +1,8 @@
+
+- Importer la librairie du repertoire /libs dans le classpath du projet et plus précisément dans le repertoie /lib du serveur default du jboss
+(Add Variable > JBOSS_HOME > Extend > server/default/lib)
+
+- Exporter le jar du projet dans /jboss/server/default/deploy
+
+- Lancer /ejbModule/fr/alma/ecommerce/frontal/Client.java
+
